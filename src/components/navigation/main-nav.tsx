@@ -9,7 +9,7 @@ export function MainNav() {
 
   const navItems = [
     { href: "/groups", label: "Groups" },
-    { href: "/groups/settings", label: "Settings" },
+    { href: "/settings", label: "Settings" },
   ];
 
   return (
