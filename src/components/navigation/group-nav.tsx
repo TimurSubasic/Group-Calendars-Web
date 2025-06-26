@@ -37,7 +37,7 @@ export function GroupNav({ groupId }: GroupNavProps) {
         <Button variant="ghost" size="sm" asChild>
           <Link href="/groups">
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Groups
+            Back
           </Link>
         </Button>
         <h1 className="text-2xl font-bold">Group {groupId}</h1>
