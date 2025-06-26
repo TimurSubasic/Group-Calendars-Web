@@ -13,8 +13,8 @@ export default function UserSettingsPage() {
 
         <Button
           variant="destructive"
-          className="mt-4"
-          size="lg"
+          className="mt-4 text-xl"
+          size="xl"
           onClick={() => signOut({ redirectUrl: "/" })}
         >
           Sign Out

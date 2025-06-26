@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { ClerkProvider } from "@clerk/nextjs";
+import { ClerkProvider, SignedIn } from "@clerk/nextjs";
 import { MainNav } from "@/components/navigation/main-nav";
+import { ThemeProvider } from "@/components/theme-provider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -30,12 +31,26 @@ export default function RootLayout({
         <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased text-primary`}
         >
-          <header className="border-b">
-            <div className="container mx-auto px-4">
-              <MainNav />
-            </div>
-          </header>
-          <main className="container mx-auto px-4 py-6">{children}</main>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+            value={{
+              light: "light",
+              dark: "dark",
+            }}
+          >
+            <SignedIn>
+              <header className="border-b">
+                <div className="container mx-auto px-4">
+                  <MainNav />
+                </div>
+              </header>
+            </SignedIn>
+
+            <main className="container mx-auto px-4 py-6">{children}</main>
+          </ThemeProvider>
         </body>
       </html>
     </ClerkProvider>

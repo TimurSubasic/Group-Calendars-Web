@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { ModeToggle } from "../mode-toggle";
 
 export function MainNav() {
   const pathname = usePathname();
@@ -13,7 +14,7 @@ export function MainNav() {
   ];
 
   return (
-    <nav className="flex items-center space-x-6 py-4">
+    <nav className="flex items-center justify-between py-4">
       <div className="flex items-center space-x-6">
         <Link href="/groups" className="text-xl font-bold">
           Group Calendars
@@ -33,6 +34,7 @@ export function MainNav() {
           </Link>
         ))}
       </div>
+      <ModeToggle />
     </nav>
   );
 }
