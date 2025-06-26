@@ -16,7 +16,7 @@ export function MainNav() {
     <nav className="flex items-center space-x-6 py-4">
       <div className="flex items-center space-x-6">
         <Link href="/groups" className="text-xl font-bold">
-          MyApp
+          Group Calendars
         </Link>
         {navItems.map((item) => (
           <Link
