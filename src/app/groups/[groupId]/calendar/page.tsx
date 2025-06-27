@@ -1,21 +1,10 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Calendar } from "@/components/ui/calendar";
 
 export default function GroupCalendarPage() {
   const [date, setDate] = useState<Date | undefined>(new Date());
-
-  useEffect(() => {
-    if (
-      typeof window !== "undefined" &&
-      navigator.userAgent.includes("iPhone")
-    ) {
-      setTimeout(() => {
-        window.dispatchEvent(new Event("resize"));
-      }, 150);
-    }
-  }, []);
 
   return (
     <div className="space-y-6">
@@ -26,7 +15,7 @@ export default function GroupCalendarPage() {
             mode="single"
             selected={date}
             onSelect={setDate}
-            className="rounded-lg border text-sm mx-auto md:mx-0"
+            className="rounded-lg border mx-auto scale-105 sm:scale-100 sm:w-full sm:max-w-sm sm:text-sm md:mx-0"
           />
         </div>
       </div>

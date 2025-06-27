@@ -42,7 +42,7 @@ export function GroupNav() {
         <h1 className="text-2xl font-bold">Group {groupId}</h1>
       </div>
 
-      <nav className="flex space-x-1 border-b">
+      <nav className="flex space-x-1 border-b -mx-2 sm:mx-0">
         {navItems.map((item) => {
           const Icon = item.icon;
           return (
