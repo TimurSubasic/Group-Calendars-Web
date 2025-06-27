@@ -1,22 +1,40 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Calendar } from "@/components/ui/calendar";
+import { Button } from "@/components/ui/button";
 
 export default function GroupCalendarPage() {
   const [date, setDate] = useState<Date | undefined>(new Date());
 
+  useEffect(() => {
+    if (
+      typeof window !== "undefined" &&
+      navigator.userAgent.includes("iPhone")
+    ) {
+      setTimeout(() => {
+        window.dispatchEvent(new Event("resize"));
+      }, 150);
+    }
+  }, []);
+
   return (
     <div className="space-y-6">
       <h2 className="text-xl font-semibold">Calendar</h2>
-      <div className="bg-muted/50 rounded-lg px-4 py-4 sm:p-8 min-h-[520px]">
-        <div className="block w-full min-h-[520px] overflow-visible">
-          <Calendar
-            mode="single"
-            selected={date}
-            onSelect={setDate}
-            className="rounded-lg border mx-auto scale-105 sm:scale-100 sm:w-full sm:max-w-sm sm:text-sm md:mx-0"
-          />
+      {/* container */}
+      <div className="bg-muted/50 rounded-lg p-8">
+        <div className="flex items-center justify-center lg:justify-start w-full">
+          {/* calnedar with buttons */}
+          <div className="inline-block bg-background space-y-6 rounded-lg border p-5">
+            <Calendar
+              mode="single"
+              selected={date}
+              onSelect={setDate}
+              className="rounded-lg border text-sm"
+            />
+
+            <Button className="w-full">Save</Button>
+          </div>
         </div>
       </div>
     </div>
