@@ -1,11 +1,11 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
 
 export default function GroupCalendarPage() {
-  const [date, setDate] = useState<Date | undefined>(new Date());
+  // const [date, setDate] = useState<Date | undefined>(new Date());
 
   useEffect(() => {
     if (
@@ -27,9 +27,8 @@ export default function GroupCalendarPage() {
           {/* calnedar with buttons */}
           <div className="inline-block bg-background space-y-6 rounded-lg border p-5">
             <Calendar
-              mode="single"
-              selected={date}
-              onSelect={setDate}
+              mode="range"
+              // get the range
               className="rounded-lg border text-sm"
             />
 
