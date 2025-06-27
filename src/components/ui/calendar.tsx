@@ -42,7 +42,7 @@ function Calendar({
       }}
       classNames={{
         root: cn(
-          "w-fit overflow-visible w-full max-w-sm ",
+          "w-fit overflow-visible block w-full max-w-sm ",
           defaultClassNames.root
         ),
         months: cn(
