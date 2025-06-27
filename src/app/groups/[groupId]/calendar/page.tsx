@@ -10,12 +10,14 @@ export default function GroupCalendarPage() {
     <div className="space-y-6">
       <h2 className="text-xl font-semibold">Calendar</h2>
       <div className="bg-muted/50 rounded-lg px-4 py-4 sm:p-8 min-h-[520px]">
-        <Calendar
-          mode="single"
-          selected={date}
-          onSelect={setDate}
-          className="rounded-lg border w-full max-w-sm text-sm mx-auto md:mx-0"
-        />
+        <div className="block w-full min-h-[520px] overflow-visible">
+          <Calendar
+            mode="single"
+            selected={date}
+            onSelect={setDate}
+            className="rounded-lg border w-full max-w-sm text-sm mx-auto md:mx-0"
+          />
+        </div>
       </div>
     </div>
   );
