@@ -40,7 +40,7 @@ export default function OauthSignIn() {
         <h1 className="text-3xl font-bold text-center">
           Welcome to Group Calendars
         </h1>
-        <p className="text-lg text-gray-700 text-center">
+        <p className="text-lg text-accent-foreground text-center">
           Please sign in to continue
         </p>
         <Button

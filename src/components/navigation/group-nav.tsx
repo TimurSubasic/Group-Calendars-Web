@@ -1,17 +1,16 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { useParams, usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { ArrowLeft, Calendar, Users, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-interface GroupNavProps {
-  groupId: string;
-}
-
-export function GroupNav({ groupId }: GroupNavProps) {
+export function GroupNav() {
   const pathname = usePathname();
+  const params = useParams();
+
+  const groupId = params.groupId as string;
 
   const navItems = [
     {

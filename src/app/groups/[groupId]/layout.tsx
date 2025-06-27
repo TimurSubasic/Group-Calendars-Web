@@ -8,7 +8,7 @@ export default function GroupLayout({
 }) {
   return (
     <div className="space-y-6">
-      <GroupNav groupId={"1"} />
+      <GroupNav />
       {children}
     </div>
   );

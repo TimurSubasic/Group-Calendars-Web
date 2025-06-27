@@ -15,7 +15,7 @@ export default function GroupCalendarPage() {
             mode="single"
             selected={date}
             onSelect={setDate}
-            className="rounded-lg border w-full h-auto md:w-96 md:h-96"
+            className="rounded-lg border mx-auto0 sm:w-96 sm:h-96 md:mx-0 transition-all duration-150"
           />
         </div>
       </div>
