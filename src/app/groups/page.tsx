@@ -26,7 +26,7 @@ export default function GroupsPage() {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {groups.map((group) => (
           <Link key={group.id} href={`/groups/${group.id}/calendar`}>
-            <Card className="hover:shadow-lg dark:hover:shadow-muted/60 transition-shadow cursor-pointer">
+            <Card className="hover:shadow-lg dark:hover:shadow-card transition-shadow cursor-pointer">
               <CardHeader>
                 <CardTitle>{group.name}</CardTitle>
               </CardHeader>
