@@ -58,7 +58,7 @@ export default function GroupSettingsPage() {
 
         <MapMembers users={admins} />
 
-        <Button className="w-full text-lg" size="xl">
+        <Button className="w-full" size="xl">
           Add Admins
         </Button>
 
@@ -107,10 +107,10 @@ export default function GroupSettingsPage() {
         />
 
         <div className="flex flex-col md:flex-row gap-4">
-          <Button variant="destructive" className="text-xl flex-1" size="xl">
+          <Button variant="destructive" className=" flex-1" size="xl">
             Leave
           </Button>
-          <Button variant="destructive" className=" text-xl flex-1" size="xl">
+          <Button variant="destructive" className=" flex-1" size="xl">
             Delete
           </Button>
         </div>
