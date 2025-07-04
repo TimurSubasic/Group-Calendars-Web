@@ -43,11 +43,11 @@ const groups = [
 // const groups = [] as { id: string; name: string; members: number }[];
 
 export default function GroupsPage() {
+  const [maxBookings, setMaxBookings] = useState("1");
+
   if (groups.length === 0) {
     return <NoGroups />;
   }
-
-  const [maxBookings, setMaxBookings] = useState("1");
 
   return (
     <div className="space-y-6">
