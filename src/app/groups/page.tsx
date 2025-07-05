@@ -148,6 +148,25 @@ export default function GroupsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold">Groups</h1>
+        <div className="flex gap-4">
+          <Button
+            onClick={() => setCreateOpen(true)}
+            size="lg"
+            className="w-27"
+          >
+            Create
+            <IoIosCreate />
+          </Button>
+          <Button
+            onClick={() => setJoinOpen(true)}
+            size="lg"
+            className="w-27"
+            variant="outline"
+          >
+            Join
+            <IoEnter />
+          </Button>
+        </div>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -165,166 +184,125 @@ export default function GroupsPage() {
         ))}
       </div>
 
-      <div className="flex max-w-md space-x-3 mt-10">
-        {/* create  */}
-        <Dialog open={createOpen} onOpenChange={setCreateOpen}>
-          <form className="flex-1">
-            <DialogTrigger className="w-full" asChild>
-              <Button
-                size="xl"
-                className="w-full text-lg"
-                onClick={() => setCreateOpen(true)}
-              >
-                Create
-                <IoIosCreate className="size-8" />
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px]">
-              <DialogHeader>
-                <DialogTitle>Create a Group</DialogTitle>
-                <DialogDescription>
-                  Settings can be changed later on.
-                </DialogDescription>
-              </DialogHeader>
-              <div className="grid gap-8 my-5">
-                <div className="grid gap-3">
-                  <Label htmlFor="name-1">Group Name</Label>
-                  <Input
-                    id="group-name"
-                    name="name"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                  />
-                  <p
-                    className={`text-destructive font-semibold duration-150
+      {/* create  */}
+      <Dialog open={createOpen} onOpenChange={setCreateOpen}>
+        <form className="flex-1">
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle>Create a Group</DialogTitle>
+              <DialogDescription>
+                Settings can be changed later on.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-8 my-5">
+              <div className="grid gap-3">
+                <Label htmlFor="name-1">Group Name</Label>
+                <Input
+                  id="group-name"
+                  name="name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                />
+                <p
+                  className={`text-destructive font-semibold duration-150
           ${hasName ? "opacity-0" : "opacity-100"}
           `}
-                  >
-                    Group name must be at least 2 letters
-                  </p>
-                </div>
-                <div className="flex items-center gap-5 justify-between">
-                  <Label>Bookings per Member:</Label>
-
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button size="lg" className="text-lg" variant="outline">
-                        {maxBookings} <RiMenuFold4Line size={8} />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent className="w-56">
-                      <DropdownMenuLabel>Max Bookings</DropdownMenuLabel>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuRadioGroup
-                        value={maxBookings}
-                        onValueChange={setMaxBookings}
-                      >
-                        <DropdownMenuRadioItem value="1">
-                          1
-                        </DropdownMenuRadioItem>
-                        <DropdownMenuRadioItem value="2">
-                          2
-                        </DropdownMenuRadioItem>
-                        <DropdownMenuRadioItem value="3">
-                          3
-                        </DropdownMenuRadioItem>
-                        <DropdownMenuRadioItem value="4">
-                          4
-                        </DropdownMenuRadioItem>
-                        <DropdownMenuRadioItem value="5">
-                          5
-                        </DropdownMenuRadioItem>
-                        <DropdownMenuRadioItem value="6">
-                          6
-                        </DropdownMenuRadioItem>
-                        <DropdownMenuRadioItem value="7">
-                          7
-                        </DropdownMenuRadioItem>
-                        <DropdownMenuRadioItem value="8">
-                          8
-                        </DropdownMenuRadioItem>
-                        <DropdownMenuRadioItem value="9">
-                          9
-                        </DropdownMenuRadioItem>
-                        <DropdownMenuRadioItem value="10">
-                          10
-                        </DropdownMenuRadioItem>
-                      </DropdownMenuRadioGroup>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </div>
-                <div className="flex items-center  gap-5 justify-between my-5">
-                  <Label>Allow members to Join:</Label>
-
-                  <Switch
-                    checked={allowJoin}
-                    onCheckedChange={() => setAllowJoin(!allowJoin)}
-                  />
-                </div>
+                >
+                  Group name must be at least 2 letters
+                </p>
               </div>
-              <DialogFooter>
-                <DialogClose asChild>
-                  <Button size="lg" variant="outline">
-                    Cancel
-                  </Button>
-                </DialogClose>
-                <Button size="lg" onClick={handleCreate}>
-                  Create
-                </Button>
-              </DialogFooter>
-            </DialogContent>
-          </form>
-        </Dialog>
+              <div className="flex items-center gap-5 justify-between">
+                <Label>Bookings per Member:</Label>
 
-        {/* join */}
-        <Dialog open={joinOpen} onOpenChange={setJoinOpen}>
-          <form className="flex-1">
-            <DialogTrigger className="w-full" asChild>
-              <Button
-                size="xl"
-                variant="outline"
-                className="w-full text-lg"
-                onClick={() => setJoinOpen(true)}
-              >
-                Join
-                <IoEnter className="size-8" />
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button size="lg" className="text-lg" variant="outline">
+                      {maxBookings} <RiMenuFold4Line size={8} />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="w-56">
+                    <DropdownMenuLabel>Max Bookings</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuRadioGroup
+                      value={maxBookings}
+                      onValueChange={setMaxBookings}
+                    >
+                      <DropdownMenuRadioItem value="1">1</DropdownMenuRadioItem>
+                      <DropdownMenuRadioItem value="2">2</DropdownMenuRadioItem>
+                      <DropdownMenuRadioItem value="3">3</DropdownMenuRadioItem>
+                      <DropdownMenuRadioItem value="4">4</DropdownMenuRadioItem>
+                      <DropdownMenuRadioItem value="5">5</DropdownMenuRadioItem>
+                      <DropdownMenuRadioItem value="6">6</DropdownMenuRadioItem>
+                      <DropdownMenuRadioItem value="7">7</DropdownMenuRadioItem>
+                      <DropdownMenuRadioItem value="8">8</DropdownMenuRadioItem>
+                      <DropdownMenuRadioItem value="9">9</DropdownMenuRadioItem>
+                      <DropdownMenuRadioItem value="10">
+                        10
+                      </DropdownMenuRadioItem>
+                    </DropdownMenuRadioGroup>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+              <div className="flex items-center  gap-5 justify-between my-5">
+                <Label>Allow members to Join:</Label>
+
+                <Switch
+                  checked={allowJoin}
+                  onCheckedChange={() => setAllowJoin(!allowJoin)}
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <DialogClose asChild>
+                <Button size="lg" variant="outline">
+                  Cancel
+                </Button>
+              </DialogClose>
+              <Button size="lg" onClick={handleCreate}>
+                Create
               </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px]">
-              <DialogHeader>
-                <DialogTitle>Join via Code</DialogTitle>
-                <DialogDescription>
-                  Enter unique code to join a group.
-                </DialogDescription>
-              </DialogHeader>
-              <div className="grid gap-8 my-5">
-                <div className="grid gap-3">
-                  <Label htmlFor="name-1">Code</Label>
-                  <Input
-                    id="code"
-                    name="code"
-                    value={code}
-                    onChange={(e) => setCode(e.target.value)}
-                  />
-                  <p className="text-destructive font-semibold duration-150">
-                    {joinMessage}
-                  </p>
-                </div>
+            </DialogFooter>
+          </DialogContent>
+        </form>
+      </Dialog>
+
+      {/* join */}
+      <Dialog open={joinOpen} onOpenChange={setJoinOpen}>
+        <form className="flex-1">
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle>Join via Code</DialogTitle>
+              <DialogDescription>
+                Enter unique code to join a group.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-8 my-5">
+              <div className="grid gap-3">
+                <Label htmlFor="name-1">Code</Label>
+                <Input
+                  id="code"
+                  name="code"
+                  value={code}
+                  onChange={(e) => setCode(e.target.value)}
+                />
+                <p className="text-destructive font-semibold duration-150">
+                  {joinMessage}
+                </p>
               </div>
-              <DialogFooter>
-                <DialogClose asChild>
-                  <Button size="lg" variant="outline">
-                    Cancel
-                  </Button>
-                </DialogClose>
-                <Button size="lg" type="submit" onClick={handleJoin}>
-                  Join
+            </div>
+            <DialogFooter>
+              <DialogClose asChild>
+                <Button size="lg" variant="outline">
+                  Cancel
                 </Button>
-              </DialogFooter>
-            </DialogContent>
-          </form>
-        </Dialog>
-      </div>
+              </DialogClose>
+              <Button size="lg" type="submit" onClick={handleJoin}>
+                Join
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </form>
+      </Dialog>
     </div>
   );
 }
