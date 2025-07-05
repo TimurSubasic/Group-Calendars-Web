@@ -21,7 +21,7 @@ export default function UserSettingsPage() {
   };
 
   const handleUsernameChange = () => {
-    if (text.trimStart().length > 1) {
+    if (text.trim().length > 1) {
       setUsername(text);
       setText("");
       setShowError(false);

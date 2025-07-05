@@ -4,6 +4,7 @@ import "./globals.css";
 import { ClerkProvider, SignedIn } from "@clerk/nextjs";
 import { MainNav } from "@/components/navigation/main-nav";
 import { ThemeProvider } from "@/components/theme-provider";
+import ConvexClientProvider from "@/components/ConvexClientProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -31,26 +32,28 @@ export default function RootLayout({
         <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased text-primary`}
         >
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-            value={{
-              light: "light",
-              dark: "dark",
-            }}
-          >
-            <SignedIn>
-              <header className="border-b">
-                <div className="container mx-auto px-4">
-                  <MainNav />
-                </div>
-              </header>
-            </SignedIn>
+          <ConvexClientProvider>
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="system"
+              enableSystem
+              disableTransitionOnChange
+              value={{
+                light: "light",
+                dark: "dark",
+              }}
+            >
+              <SignedIn>
+                <header className="border-b">
+                  <div className="container mx-auto px-4">
+                    <MainNav />
+                  </div>
+                </header>
+              </SignedIn>
 
-            <main className="container mx-auto px-4 py-6">{children}</main>
-          </ThemeProvider>
+              <main className="container mx-auto px-4 py-6">{children}</main>
+            </ThemeProvider>
+          </ConvexClientProvider>
         </body>
       </html>
     </ClerkProvider>
