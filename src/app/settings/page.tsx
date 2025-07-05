@@ -1,7 +1,6 @@
 "use client";
 
 import colors from "@/components/colors";
-import Loading from "@/components/Loading";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
