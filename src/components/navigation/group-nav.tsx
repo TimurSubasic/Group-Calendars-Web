@@ -5,12 +5,20 @@ import { useParams, usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { ArrowLeft, Calendar, Users, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useQuery } from "convex/react";
+import { api } from "../../../convex/_generated/api";
+import { Id } from "../../../convex/_generated/dataModel";
+import LoadingNav from "./LoadingNav";
 
 export function GroupNav() {
   const pathname = usePathname();
   const params = useParams();
 
   const groupId = params.groupId as string;
+
+  const group = useQuery(api.groups.getById, {
+    groupId: groupId as Id<"groups">,
+  });
 
   const navItems = [
     {
@@ -30,6 +38,10 @@ export function GroupNav() {
     },
   ];
 
+  if (group === undefined) {
+    return <LoadingNav />;
+  }
+
   return (
     <div className="space-y-4">
       <div className="flex items-center space-x-4">
@@ -39,7 +51,7 @@ export function GroupNav() {
             Back
           </Link>
         </Button>
-        <h1 className="text-2xl font-bold">Group {groupId}</h1>
+        <h1 className="text-2xl font-bold">{group?.name}</h1>
       </div>
 
       <nav className="flex space-x-1 border-b -mx-2 sm:mx-0">
