@@ -4,25 +4,40 @@ import colors from "@/components/colors";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useClerk } from "@clerk/nextjs";
-import { useState } from "react";
+import { useClerk, useUser } from "@clerk/nextjs";
+import { useMutation, useQuery } from "convex/react";
+import { useEffect, useState } from "react";
+import { api } from "../../../convex/_generated/api";
+import Loading from "@/components/Loading";
 
 export default function UserSettingsPage() {
   const { signOut } = useClerk();
 
-  const [username, setUsername] = useState("Timur");
-  const [pickedColor, setPickedColor] = useState("#469990");
+  const { user } = useUser();
+
+  const clerkId = user?.id as string;
+
+  const fullUser = useQuery(
+    api.users.getUserByClerk,
+    clerkId ? { clerkId } : "skip"
+  );
+
+  const [pickedColor, setPickedColor] = useState(fullUser?.color);
   const [text, setText] = useState("");
   const [showError, setShowError] = useState(false);
 
-  const user = {
-    name: username,
-    color: pickedColor,
-  };
+  useEffect(() => {
+    setPickedColor(fullUser?.color);
+  }, [fullUser]);
+
+  const changeUsername = useMutation(api.users.changeUsername);
 
   const handleUsernameChange = () => {
-    if (text.trim().length > 1) {
-      setUsername(text);
+    if (text.trim().length > 1 && fullUser !== null && fullUser !== undefined) {
+      changeUsername({
+        id: fullUser._id,
+        username: text,
+      });
       setText("");
       setShowError(false);
     } else {
@@ -30,6 +45,37 @@ export default function UserSettingsPage() {
     }
   };
 
+  // change color
+  const changeColor = useMutation(api.users.changeColor);
+
+  const [debouncedColor, setDebouncedColor] = useState(pickedColor);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedColor(pickedColor);
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [pickedColor]);
+
+  useEffect(() => {
+    if (
+      debouncedColor !== fullUser?.color &&
+      fullUser !== null &&
+      fullUser !== undefined &&
+      debouncedColor !== undefined
+    ) {
+      changeColor({
+        id: fullUser._id,
+        color: debouncedColor,
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [debouncedColor, fullUser]);
+
+  if (fullUser === undefined) {
+    return <Loading />;
+  }
   return (
     <div className="space-y-6">
       <h1 className="text-3xl font-bold">User Settings</h1>
@@ -37,16 +83,16 @@ export default function UserSettingsPage() {
         {/* User icon */}
         <div className="flex flex-row items-center justify-start gap-3 mb-10">
           <div
-            style={{ backgroundColor: user?.color }}
+            style={{ backgroundColor: pickedColor }}
             className="w-14 h-14 rounded-full flex items-center justify-center"
           >
             <p className="text-white text-2xl font-bold">
-              {user?.name.slice(0, 1).toUpperCase()}
+              {fullUser?.username.slice(0, 1).toUpperCase()}
             </p>
           </div>
           <div className="flex flex-col">
             <p className="text-sm text-accent-foreground">Welcome back,</p>
-            <p className="font-semibold text-xl">{user?.name}</p>
+            <p className="font-semibold text-xl">{fullUser?.username}</p>
           </div>
         </div>
 
