@@ -20,9 +20,14 @@ export function GroupNav() {
 
   const groupId = params.groupId as string;
 
-  const validation = useQuery(api.groups.validateGroup, {
-    groupId: groupId,
-  });
+  const validation = useQuery(
+    api.groups.validateGroup,
+    isLoading || !isAuthenticated
+      ? "skip"
+      : {
+          groupId: groupId,
+        }
+  );
 
   const group = useQuery(
     api.groups.getById,
@@ -57,7 +62,7 @@ export function GroupNav() {
       return;
     }
     if (isAuthenticated && validation && !validation.success) {
-      router.push("/groups");
+      router.replace("/");
     }
   }, [validation, router, isLoading, isAuthenticated]);
 

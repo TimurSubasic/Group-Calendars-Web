@@ -1,17 +1,13 @@
 import React from "react";
-
-// interface User {
-//     _id: Id<"users">;
-//     _creationTime: number;
-//     username: string;
-//     email: string;
-//     color: string;
-//     clerkId: string;
-//   }
+import { Id } from "../../convex/_generated/dataModel";
 
 interface User {
-  name: string;
+  _id: Id<"users">;
+  _creationTime: number;
+  username: string;
+  email: string;
   color: string;
+  clerkId: string;
 }
 
 export default function MapMembers({ users }: { users: (User | null)[] }) {
@@ -28,10 +24,10 @@ export default function MapMembers({ users }: { users: (User | null)[] }) {
               className="w-14 h-14 rounded-full flex items-center justify-center"
             >
               <p className="text-white text-2xl font-bold">
-                {user?.name.slice(0, 1).toUpperCase()}
+                {user?.username.slice(0, 1).toUpperCase()}
               </p>
             </div>
-            <p className="font-semibold text-xl">{user?.name}</p>
+            <p className="font-semibold text-xl">{user?.username}</p>
           </div>
 
           <div
