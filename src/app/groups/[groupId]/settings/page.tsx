@@ -13,7 +13,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { RiMenuFold4Line } from "react-icons/ri";
-import React, { use, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Switch } from "@/components/ui/switch";
 import { useConvexAuth, useMutation, useQuery } from "convex/react";
 import { api } from "../../../../../convex/_generated/api";
