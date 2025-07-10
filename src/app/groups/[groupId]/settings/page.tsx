@@ -1,6 +1,4 @@
 "use client";
-
-import colors from "@/components/colors";
 import MapMembers from "@/components/MapMembers";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
