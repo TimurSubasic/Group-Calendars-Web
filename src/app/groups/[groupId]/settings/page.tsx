@@ -13,9 +13,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { RiMenuFold4Line } from "react-icons/ri";
-import React, { useState } from "react";
+import React, { use, useEffect, useState } from "react";
 import { Switch } from "@/components/ui/switch";
-import { useConvexAuth, useQuery } from "convex/react";
+import { useConvexAuth, useMutation, useQuery } from "convex/react";
 import { api } from "../../../../../convex/_generated/api";
 import { Id } from "../../../../../convex/_generated/dataModel";
 import { useParams } from "next/navigation";
@@ -80,7 +80,48 @@ export default function GroupSettingsPage() {
       : "skip"
   );
 
-  const [maxBookings, setMaxBookings] = useState("3");
+  const updateMaxBookings = useMutation(api.groups.updateMaxBookings);
+
+  const updateAllowJoin = useMutation(api.groups.updateAllowJoin);
+
+  const changeName = useMutation(api.groups.changeName);
+
+  const [name, setName] = useState("");
+  const [maxBookings, setMaxBookings] = useState("...");
+  const [allowJoin, setAllowJoin] = useState(false);
+
+  useEffect(() => {
+    if (group) {
+      setAllowJoin(group.allowJoin);
+      setMaxBookings(group.maxBookings.toString());
+    }
+  }, [group]);
+
+  const handleNameChange = () => {
+    changeName({
+      groupId: groupId as Id<"groups">,
+      name: name,
+    });
+    setName("");
+  };
+
+  const handleBookingsChange = (value: string) => {
+    const newBookings = Number(value);
+    setMaxBookings(value);
+    updateMaxBookings({
+      groupId: groupId as Id<"groups">,
+      maxBookings: newBookings,
+    });
+  };
+
+  const handleJoinChange = () => {
+    const newAllowJoin = !allowJoin;
+    updateAllowJoin({
+      groupId: groupId as Id<"groups">,
+      allowJoin: newAllowJoin,
+    });
+    setAllowJoin(newAllowJoin);
+  };
 
   if (
     validation === undefined ||
@@ -98,8 +139,17 @@ export default function GroupSettingsPage() {
         <div className="grid w-full items-center gap-3">
           <Label>Change Group Name</Label>
           <div className="flex gap-2">
-            <Input type="text" placeholder="Group Name" />
-            <Button className="h-12 text-lg flex-1" size="xl">
+            <Input
+              type="text"
+              placeholder="Group Name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
+            <Button
+              onClick={handleNameChange}
+              className="h-12 text-lg flex-1"
+              size="xl"
+            >
               Save
             </Button>
           </div>
@@ -128,7 +178,7 @@ export default function GroupSettingsPage() {
                 <DropdownMenuSeparator />
                 <DropdownMenuRadioGroup
                   value={maxBookings}
-                  onValueChange={setMaxBookings}
+                  onValueChange={handleBookingsChange}
                 >
                   <DropdownMenuRadioItem value="1">1</DropdownMenuRadioItem>
                   <DropdownMenuRadioItem value="2">2</DropdownMenuRadioItem>
@@ -148,7 +198,7 @@ export default function GroupSettingsPage() {
           <div className="flex items-center  gap-5 justify-between">
             <Label>Allow members to Join:</Label>
 
-            <Switch />
+            <Switch checked={allowJoin} onClick={handleJoinChange} />
           </div>
         </div>
 
