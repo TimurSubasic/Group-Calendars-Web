@@ -62,6 +62,7 @@ export function GroupNav() {
       return;
     }
     if (isAuthenticated && validation && !validation.success) {
+      console.log(validation.message);
       router.replace("/");
     }
   }, [validation, router, isLoading, isAuthenticated]);

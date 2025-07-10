@@ -79,7 +79,7 @@ export default function GroupMembersPage() {
         },
         position: "top-center",
       });
-    } catch (error) {
+    } catch {
       toast("Error occured while copying code");
     }
   };
