@@ -12,6 +12,15 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { RiMenuFold4Line } from "react-icons/ri";
 import React, { useEffect, useState } from "react";
 import { Switch } from "@/components/ui/switch";
@@ -21,8 +30,20 @@ import { Id } from "../../../../../convex/_generated/dataModel";
 import { useParams } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
 import Loading from "@/components/Loading";
+import { useRouter } from "next/navigation";
+import SelectableUsers from "@/components/SelectableUsers";
+
+interface User {
+  _id: Id<"users">;
+  _creationTime: number;
+  username: string;
+  email: string;
+  color: string;
+  clerkId: string;
+}
 
 export default function GroupSettingsPage() {
+  const router = useRouter();
   const params = useParams();
   const groupId = params.groupId as string;
   const { isLoading, isAuthenticated } = useConvexAuth();
@@ -37,6 +58,7 @@ export default function GroupSettingsPage() {
     clerkId ? { clerkId } : "skip"
   );
 
+  // get data from queries
   const validation = useQuery(
     api.groups.validateGroup,
     isLoading || !isAuthenticated
@@ -80,6 +102,7 @@ export default function GroupSettingsPage() {
       : "skip"
   );
 
+  //* handle mutations
   const updateMaxBookings = useMutation(api.groups.updateMaxBookings);
 
   const updateAllowJoin = useMutation(api.groups.updateAllowJoin);
@@ -123,6 +146,41 @@ export default function GroupSettingsPage() {
     setAllowJoin(newAllowJoin);
   };
 
+  //* add admins
+  const [adminsOpen, setAdminsOpen] = useState(false);
+
+  const handleSelectionChange = (selectedUsers: User[]) => {
+    console.log("Selected users:", selectedUsers);
+  };
+
+  //! remove and delete
+  const removeMember = useMutation(api.groupMembers.removeMember);
+
+  const handleLeave = async () => {
+    if (fullUser) {
+      const result = await removeMember({
+        groupId: groupId as Id<"groups">,
+        userId: fullUser._id,
+      });
+
+      if (result.success) {
+        router.replace("/groups");
+      }
+    }
+  };
+
+  const deleteGroup = useMutation(api.groups.deleteGroup);
+
+  const handleDelete = async () => {
+    const result = await deleteGroup({
+      groupId: groupId as Id<"groups">,
+    });
+
+    if (result.success) {
+      router.replace("/groups");
+    }
+  };
+
   if (
     validation === undefined ||
     admins === undefined ||
@@ -136,86 +194,152 @@ export default function GroupSettingsPage() {
     <div className="space-y-6">
       <h2 className="text-xl font-semibold">Settings</h2>
       <div className="bg-muted/50 rounded-lg p-8 flex flex-col space-y-7">
-        <div className="grid w-full items-center gap-3">
-          <Label>Change Group Name</Label>
-          <div className="flex gap-2">
-            <Input
-              type="text"
-              placeholder="Group Name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-            />
+        {isAdmin ? (
+          <div className="flex flex-col space-y-7">
+            <div className="grid w-full items-center gap-3">
+              <Label>Change Group Name</Label>
+              <div className="flex gap-2">
+                <Input
+                  type="text"
+                  placeholder="Group Name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                />
+                <Button
+                  onClick={handleNameChange}
+                  className="h-12 text-lg flex-1"
+                  size="xl"
+                >
+                  Save
+                </Button>
+              </div>
+            </div>
+
+            <Label>Admins</Label>
+
+            <MapMembers users={admins} />
+
             <Button
-              onClick={handleNameChange}
-              className="h-12 text-lg flex-1"
+              onClick={() => setAdminsOpen(true)}
+              className="w-full"
               size="xl"
             >
-              Save
+              Add Admins
+            </Button>
+
+            <div className="flex flex-col space-y-7  w-full md:flex-row md:space-y-0 md:justify-around my-5 ">
+              <div className="flex items-center gap-5 justify-between">
+                <Label>Bookings per Member:</Label>
+
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button size="lg" className="text-lg" variant="outline">
+                      {maxBookings} <RiMenuFold4Line size={8} />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="w-56">
+                    <DropdownMenuLabel>Max Bookings</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuRadioGroup
+                      value={maxBookings}
+                      onValueChange={handleBookingsChange}
+                    >
+                      <DropdownMenuRadioItem value="1">1</DropdownMenuRadioItem>
+                      <DropdownMenuRadioItem value="2">2</DropdownMenuRadioItem>
+                      <DropdownMenuRadioItem value="3">3</DropdownMenuRadioItem>
+                      <DropdownMenuRadioItem value="4">4</DropdownMenuRadioItem>
+                      <DropdownMenuRadioItem value="5">5</DropdownMenuRadioItem>
+                      <DropdownMenuRadioItem value="6">6</DropdownMenuRadioItem>
+                      <DropdownMenuRadioItem value="7">7</DropdownMenuRadioItem>
+                      <DropdownMenuRadioItem value="8">8</DropdownMenuRadioItem>
+                      <DropdownMenuRadioItem value="9">9</DropdownMenuRadioItem>
+                      <DropdownMenuRadioItem value="10">
+                        10
+                      </DropdownMenuRadioItem>
+                    </DropdownMenuRadioGroup>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+
+              <div className="flex items-center  gap-5 justify-between">
+                <Label>Allow members to Join:</Label>
+
+                <Switch checked={allowJoin} onClick={handleJoinChange} />
+              </div>
+            </div>
+
+            <Button
+              variant="destructive"
+              className="w-full my-6 h-4 cursor-default "
+            />
+
+            <div className="flex flex-col md:flex-row gap-4">
+              <Button
+                onClick={handleLeave}
+                variant="destructive"
+                className=" flex-1"
+                size="xl"
+              >
+                Leave
+              </Button>
+              <Button
+                onClick={handleDelete}
+                variant="destructive"
+                className=" flex-1"
+                size="xl"
+              >
+                Delete
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <div className=" flex flex-col space-y-7">
+            <h1 className="text-2xl text-center">
+              Only admins can change Settings
+            </h1>
+
+            <Label>Admins</Label>
+            <MapMembers users={admins} />
+            <Button
+              onClick={handleLeave}
+              className="w-full mt-4"
+              variant={"destructive"}
+              size="xl"
+            >
+              Leave
             </Button>
           </div>
-        </div>
-
-        <Label>Admins</Label>
-
-        <MapMembers users={admins} />
-
-        <Button className="w-full" size="xl">
-          Add Admins
-        </Button>
-
-        <div className="flex flex-col space-y-7  w-full md:flex-row md:space-y-0 md:justify-around my-5 ">
-          <div className="flex items-center gap-5 justify-between">
-            <Label>Bookings per Member:</Label>
-
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button size="lg" className="text-lg" variant="outline">
-                  {maxBookings} <RiMenuFold4Line size={8} />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-56">
-                <DropdownMenuLabel>Max Bookings</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuRadioGroup
-                  value={maxBookings}
-                  onValueChange={handleBookingsChange}
-                >
-                  <DropdownMenuRadioItem value="1">1</DropdownMenuRadioItem>
-                  <DropdownMenuRadioItem value="2">2</DropdownMenuRadioItem>
-                  <DropdownMenuRadioItem value="3">3</DropdownMenuRadioItem>
-                  <DropdownMenuRadioItem value="4">4</DropdownMenuRadioItem>
-                  <DropdownMenuRadioItem value="5">5</DropdownMenuRadioItem>
-                  <DropdownMenuRadioItem value="6">6</DropdownMenuRadioItem>
-                  <DropdownMenuRadioItem value="7">7</DropdownMenuRadioItem>
-                  <DropdownMenuRadioItem value="8">8</DropdownMenuRadioItem>
-                  <DropdownMenuRadioItem value="9">9</DropdownMenuRadioItem>
-                  <DropdownMenuRadioItem value="10">10</DropdownMenuRadioItem>
-                </DropdownMenuRadioGroup>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-
-          <div className="flex items-center  gap-5 justify-between">
-            <Label>Allow members to Join:</Label>
-
-            <Switch checked={allowJoin} onClick={handleJoinChange} />
-          </div>
-        </div>
-
-        <Button
-          variant="destructive"
-          className="w-full my-6 h-4 cursor-default "
-        />
-
-        <div className="flex flex-col md:flex-row gap-4">
-          <Button variant="destructive" className=" flex-1" size="xl">
-            Leave
-          </Button>
-          <Button variant="destructive" className=" flex-1" size="xl">
-            Delete
-          </Button>
-        </div>
+        )}
       </div>
+
+      <Dialog open={adminsOpen} onOpenChange={setAdminsOpen}>
+        <form className="flex-1">
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle>Add admins</DialogTitle>
+              <DialogDescription>
+                Admins can not be removed later, so choose wisely.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-8 my-5">
+              <SelectableUsers
+                users={nonAdmins}
+                onSelectionChange={handleSelectionChange}
+              />
+            </div>
+            <DialogFooter>
+              <DialogClose asChild>
+                <Button size="lg" variant="outline">
+                  Cancel
+                </Button>
+              </DialogClose>
+              <Button size="lg" type="submit" onClick={() => {}}>
+                Join
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </form>
+      </Dialog>
     </div>
   );
 }
