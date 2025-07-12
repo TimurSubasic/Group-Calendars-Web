@@ -149,8 +149,25 @@ export default function GroupSettingsPage() {
   //* add admins
   const [adminsOpen, setAdminsOpen] = useState(false);
 
+  let newUsers: User[] = [];
+
   const handleSelectionChange = (selectedUsers: User[]) => {
-    console.log("Selected users:", selectedUsers);
+    newUsers = selectedUsers;
+  };
+
+  const addAdmin = useMutation(api.groups.addAdmin);
+
+  const handleAddAdmins = async () => {
+    if (newUsers.length > 0) {
+      for (const user of newUsers) {
+        await addAdmin({
+          groupId: groupId as Id<"groups">,
+          userId: user._id,
+        });
+      }
+      setAdminsOpen(false);
+      newUsers = []; //* Reset the newUsers array after adding
+    }
   };
 
   //! remove and delete
@@ -333,8 +350,8 @@ export default function GroupSettingsPage() {
                   Cancel
                 </Button>
               </DialogClose>
-              <Button size="lg" type="submit" onClick={() => {}}>
-                Join
+              <Button size="lg" type="submit" onClick={handleAddAdmins}>
+                Add Admins
               </Button>
             </DialogFooter>
           </DialogContent>

@@ -1,14 +1,33 @@
 "use client";
 import MapMembers from "@/components/MapMembers";
 import { Button } from "@/components/ui/button";
-import { useConvexAuth, useQuery } from "convex/react";
+import { useConvexAuth, useMutation, useQuery } from "convex/react";
 import { useParams } from "next/navigation";
-import React from "react";
+import React, { useState } from "react";
 import { api } from "../../../../../convex/_generated/api";
 import { Id } from "../../../../../convex/_generated/dataModel";
 import Loading from "@/components/Loading";
 import { useUser } from "@clerk/nextjs";
 import { toast } from "sonner";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import SelectableUsers from "@/components/SelectableUsers";
+
+interface User {
+  _id: Id<"users">;
+  _creationTime: number;
+  username: string;
+  email: string;
+  color: string;
+  clerkId: string;
+}
 
 export default function GroupMembersPage() {
   const params = useParams();
@@ -25,6 +44,7 @@ export default function GroupMembersPage() {
     clerkId ? { clerkId } : "skip"
   );
 
+  // get data from queries
   const validation = useQuery(
     api.groups.validateGroup,
     isLoading || !isAuthenticated
@@ -68,6 +88,7 @@ export default function GroupMembersPage() {
       : "skip"
   );
 
+  // *add members
   const handleAdd = async () => {
     try {
       await navigator.clipboard.writeText(group?.joinCode as string);
@@ -80,8 +101,28 @@ export default function GroupMembersPage() {
         position: "top-center",
       });
     } catch {
-      toast("Error occured while copying code");
+      toast("Error occurred while copying code");
     }
+  };
+
+  //! kick members
+  const [kickOpen, setKickOpen] = useState(false);
+  let newUsers: User[] = [];
+
+  const removeMember = useMutation(api.groupMembers.removeMember);
+
+  const handleSelectionChange = (selectedUsers: User[]) => {
+    newUsers = selectedUsers;
+  };
+
+  const handleKick = async () => {
+    for (const user of newUsers) {
+      await removeMember({
+        groupId: groupId as Id<"groups">,
+        userId: user._id,
+      });
+    }
+    setKickOpen(false);
   };
 
   if (
@@ -108,12 +149,51 @@ export default function GroupMembersPage() {
           )}
 
           {isAdmin && nonAdmins.length >= 1 && (
-            <Button className="flex-1 w-full" size="xl" variant="destructive">
+            <Button
+              onClick={() => setKickOpen(true)}
+              className="flex-1 w-full"
+              size="xl"
+              variant="destructive"
+            >
               Kick Members
             </Button>
           )}
         </div>
       </div>
+
+      <Dialog open={kickOpen} onOpenChange={setKickOpen}>
+        <form className="flex-1">
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle>Add admins</DialogTitle>
+              <DialogDescription>
+                Admins can not be removed later, so choose wisely.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-8 my-5">
+              <SelectableUsers
+                users={nonAdmins}
+                onSelectionChange={handleSelectionChange}
+              />
+            </div>
+            <DialogFooter>
+              <DialogClose asChild>
+                <Button size="lg" variant="outline">
+                  Cancel
+                </Button>
+              </DialogClose>
+              <Button
+                size="lg"
+                variant={"destructive"}
+                type="submit"
+                onClick={handleKick}
+              >
+                Kick
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </form>
+      </Dialog>
     </div>
   );
 }
