@@ -16,6 +16,7 @@ export default function MapMembers({ users }: { users: (User | null)[] }) {
       {users?.map((user, index) => (
         <div
           key={index}
+          style={{ borderColor: user?.color }}
           className="w-full flex items-center justify-between flex-row bg-background rounded-lg p-4 border hover:shadow-lg dark:hover:shadow-background transition-shadow duration-150"
         >
           <div className="flex flex-row items-center justify-start gap-3">
@@ -32,7 +33,7 @@ export default function MapMembers({ users }: { users: (User | null)[] }) {
 
           <div
             style={{ backgroundColor: user?.color }}
-            className="p-2.5 rounded-full"
+            className="h-5 w-5 rounded-full"
           />
         </div>
       ))}

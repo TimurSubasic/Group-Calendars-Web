@@ -160,7 +160,7 @@ export const getMarkedDates = query({
       // Generate dates between fromDate and toDate
       const startDate = new Date(booking.startDate);
       const endDate = new Date(booking.endDate);
-      let currentDate = new Date(startDate);
+      const currentDate = new Date(startDate);
 
       while (currentDate <= endDate) {
         const dateString = currentDate.toISOString().split("T")[0];

@@ -236,13 +236,15 @@ export default function GroupSettingsPage() {
 
             <MapMembers users={admins} />
 
-            <Button
-              onClick={() => setAdminsOpen(true)}
-              className="w-full"
-              size="xl"
-            >
-              Add Admins
-            </Button>
+            {nonAdmins.length > 0 && (
+              <Button
+                onClick={() => setAdminsOpen(true)}
+                className="w-full"
+                size="xl"
+              >
+                Add Admins
+              </Button>
+            )}
 
             <div className="flex flex-col space-y-7  w-full md:flex-row md:space-y-0 md:justify-around my-5 ">
               <div className="flex items-center gap-5 justify-between">

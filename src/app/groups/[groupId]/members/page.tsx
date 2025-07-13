@@ -125,6 +125,7 @@ export default function GroupMembersPage() {
     setKickOpen(false);
   };
 
+  // //
   if (
     validation === undefined ||
     members === undefined ||
