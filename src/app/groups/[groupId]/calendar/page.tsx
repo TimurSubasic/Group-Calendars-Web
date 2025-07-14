@@ -195,6 +195,24 @@ export default function GroupCalendarPage() {
               ? "rounded-r-md rounded-l-none"
               : "rounded-none"
         : "";
+    const bookedBorderClass = booked
+      ? booked.isStart && booked.isEnd
+        ? "border-2 border-black dark:border-white"
+        : booked.isStart
+          ? "border-2 border-black dark:border-white border-r-0"
+          : booked.isEnd
+            ? "border-2 border-black dark:border-white border-l-0"
+            : "border-2 border-black dark:border-white border-l-0 border-r-0"
+      : "";
+    const borderClass = isSelected
+      ? isStart && isEnd
+        ? "border-2 border-blue-500"
+        : isStart
+          ? "border-2 border-blue-500 border-r-0"
+          : isEnd
+            ? "border-2 border-blue-500 border-l-0"
+            : "border-2 border-blue-500 border-l-0 border-r-0"
+      : "";
     return (
       <Button
         {...props}
@@ -214,7 +232,11 @@ export default function GroupCalendarPage() {
               : undefined
         }
         className={
-          (booked || isSelected ? `!text-white ${roundedClass}` : "") +
+          (booked
+            ? `!text-white ${roundedClass} ${bookedBorderClass}`
+            : isSelected
+              ? `!text-white ${roundedClass} ${borderClass}`
+              : "") +
           " " +
           (props.className || "")
         }
@@ -421,7 +443,21 @@ export default function GroupCalendarPage() {
                       }}
                       className={`cursor-pointer border rounded-lg p-2 ${selectedBookings.includes(booking._id) ? "border-destructive bg-destructive/10" : "border-muted"}`}
                     >
-                      <BookingCard booking={booking} />
+                      <div className="flex items-center justify-between">
+                        <div
+                          style={{ backgroundColor: booking.color }}
+                          className="w-14 h-14 rounded-full flex items-center justify-center"
+                        >
+                          <p className="text-white text-2xl font-bold">
+                            {booking.username.slice(0, 1).toUpperCase()}
+                          </p>
+                        </div>
+                        <p>
+                          {booking.startDate}
+                          {booking.endDate !== booking.startDate &&
+                            " - " + booking.endDate}
+                        </p>
+                      </div>
                     </div>
                   ))}
                 </div>
