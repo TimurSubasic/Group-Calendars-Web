@@ -74,22 +74,21 @@ export default function BookingCard({
               <DialogTitle>
                 {booking.startDate} - {booking.endDate}
               </DialogTitle>
-              <DialogDescription>
-                <div className="flex flex-row items-center justify-start gap-3 mt-4 text-white">
-                  <div
-                    style={{ backgroundColor: booking?.color }}
-                    className="w-14 h-14 rounded-full flex items-center justify-center"
-                  >
-                    <p className="text-white text-2xl font-bold">
-                      {booking?.username.slice(0, 1).toUpperCase()}
-                    </p>
-                  </div>
-                  <div className="flex flex-col items-start space-y-2">
-                    <p className="font-semibold text-xl">{booking?.username}</p>
-                  </div>
-                </div>
-              </DialogDescription>
+              <DialogDescription>Note</DialogDescription>
             </DialogHeader>
+            <div className="flex flex-row items-center justify-start gap-3 text-white">
+              <div
+                style={{ backgroundColor: booking?.color }}
+                className="w-14 h-14 rounded-full flex items-center justify-center"
+              >
+                <p className="text-white text-2xl font-bold">
+                  {booking?.username.slice(0, 1).toUpperCase()}
+                </p>
+              </div>
+              <div className="flex flex-col items-start space-y-2">
+                <p className="font-semibold text-xl">{booking?.username}</p>
+              </div>
+            </div>
             <div className="grid gap-8">
               <p className="my-5 text-lg">{booking.note}</p>
             </div>

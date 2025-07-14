@@ -1,16 +1,29 @@
 "use client";
 
-import React from "react";
+import React, { useMemo, useState } from "react";
 import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
 import { useBreakpoint } from "@/components/useBreakpoint";
 import { useParams } from "next/navigation";
-import { useConvexAuth, useQuery } from "convex/react";
+import { useConvexAuth, useMutation, useQuery } from "convex/react";
 import { useUser } from "@clerk/nextjs";
 import { api } from "../../../../../convex/_generated/api";
 import { Id } from "../../../../../convex/_generated/dataModel";
 import Loading from "@/components/Loading";
 import BookingCard from "@/components/BookingCard";
+import { DayButtonProps, DateRange } from "react-day-picker";
+import { toast } from "sonner";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Label } from "@radix-ui/react-dropdown-menu";
+import { Input } from "@/components/ui/input";
 
 export default function GroupCalendarPage() {
   // const [date, setDate] = useState<Date | undefined>(new Date());
@@ -67,17 +80,226 @@ export default function GroupCalendarPage() {
       : "skip"
   );
 
+  const userBookings = useQuery(
+    api.bookings.getUserBookings,
+    validation?.success
+      ? {
+          groupId: groupId as Id<"groups">,
+          userId: fullUser?._id as Id<"users">,
+        }
+      : "skip"
+  );
+
+  // get booked dates with colors
+  const bookedDates = useQuery(
+    api.bookings.getBookedDatesWithColors,
+    validation?.success
+      ? {
+          groupId: groupId as Id<"groups">,
+        }
+      : "skip"
+  );
+
+  // Map date string to booking info for quick lookup
+  const bookedDateMap = useMemo(() => {
+    const map: Record<
+      string,
+      { color: string; isStart: boolean; isEnd: boolean }
+    > = {};
+    if (bookedDates) {
+      for (const { date, color, isStart, isEnd } of bookedDates) {
+        map[date] = { color, isStart, isEnd };
+      }
+    }
+    return map;
+  }, [bookedDates]);
+
+  // State for selected range
+  const [selectedRange, setSelectedRange] = useState<DateRange | undefined>(
+    undefined
+  );
+
+  // Helper to format date as YYYY-MM-DD
+  const formatDate = (date: Date) =>
+    [
+      date.getFullYear(),
+      String(date.getMonth() + 1).padStart(2, "0"),
+      String(date.getDate()).padStart(2, "0"),
+    ].join("-");
+
+  // All booked date strings for quick lookup
+  const allBookedDates = useMemo(
+    () => new Set(Object.keys(bookedDateMap)),
+    [bookedDateMap]
+  );
+
+  // Check if a range overlaps with booked dates
+  function isRangeOverlapping(from: Date, to: Date) {
+    const d = new Date(from);
+    while (d <= to) {
+      if (allBookedDates.has(formatDate(d))) return true;
+      d.setDate(d.getDate() + 1);
+    }
+    return false;
+  }
+
+  // Handle day click
+  function handleSelect(range: DateRange | undefined) {
+    if (!range || !range.from) return;
+    // Check if picked date is booked
+    if (range.from && range.to && isRangeOverlapping(range.from, range.to)) {
+      toast("Date already booked", {
+        description: "Please select a different date",
+      });
+      setSelectedRange(undefined);
+      return;
+    }
+    setSelectedRange(range);
+  }
+
+  // Custom DayButton for coloring booked and selected dates
+  const CustomDayButton = (props: DayButtonProps) => {
+    const dateStr = [
+      props.day.date.getFullYear(),
+      String(props.day.date.getMonth() + 1).padStart(2, "0"),
+      String(props.day.date.getDate()).padStart(2, "0"),
+    ].join("-");
+    const booked = bookedDateMap[dateStr];
+    const isSelected =
+      selectedRange?.from &&
+      ((selectedRange?.to &&
+        props.day.date >= selectedRange.from &&
+        props.day.date <= selectedRange.to) ||
+        (!selectedRange?.to &&
+          props.day.date.getTime() === selectedRange.from.getTime()));
+    const isStart =
+      selectedRange?.from &&
+      props.day.date.getTime() === selectedRange.from.getTime();
+    const isEnd =
+      selectedRange?.to &&
+      props.day.date.getTime() === selectedRange.to.getTime();
+    const roundedClass = booked
+      ? booked.isStart && booked.isEnd
+        ? "rounded-md"
+        : booked.isStart
+          ? "rounded-l-md rounded-r-none"
+          : booked.isEnd
+            ? "rounded-r-md rounded-l-none"
+            : "rounded-none"
+      : isSelected
+        ? isStart && isEnd
+          ? "rounded-md"
+          : isStart
+            ? "rounded-l-md rounded-r-none"
+            : isEnd
+              ? "rounded-r-md rounded-l-none"
+              : "rounded-none"
+        : "";
+    return (
+      <Button
+        {...props}
+        variant="ghost"
+        size="icon"
+        style={
+          booked
+            ? {
+                backgroundColor: booked.color,
+                color: "#fff",
+              }
+            : isSelected && fullUser?.color
+              ? {
+                  backgroundColor: fullUser.color,
+                  color: "#fff",
+                }
+              : undefined
+        }
+        className={
+          (booked || isSelected ? `!text-white ${roundedClass}` : "") +
+          " " +
+          (props.className || "")
+        }
+        // disabled={booked ? true : false}
+      >
+        {props.children}
+      </Button>
+    );
+  };
+
+  // If you need to use these for saving:
+  // const selectedStart = selectedRange?.from ? formatDate(selectedRange.from) : null;
+  // const selectedEnd = selectedRange?.to ? formatDate(selectedRange.to) : null;
+
+  function formatDateForDialog(dateStr: string | null) {
+    if (dateStr === null) return "";
+    const monthNames = [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ];
+    const [, mm, dd] = dateStr.split("-");
+    const monthIndex = parseInt(mm, 10) - 1;
+    return `${monthNames[monthIndex]} ${dd}`;
+  }
+
+  const [saveOpen, setSaveOpen] = useState(false);
+
+  const [startDate, setStartDate] = useState<string | null>(null);
+  const [endDate, setEndDate] = useState<string | null>(null);
+  const [note, setNote] = useState("");
+
+  const handleSave = () => {
+    if (selectedRange === undefined) {
+      toast("Please select a date");
+    } else {
+      // set correct format for dates
+      setStartDate(selectedRange.from ? formatDate(selectedRange.from) : null);
+      setEndDate(selectedRange.to ? formatDate(selectedRange.to) : null);
+      // open dialog
+      setSaveOpen(true);
+    }
+  };
+
+  const createBooking = useMutation(api.bookings.createBooking);
+
+  const handleCreate = () => {
+    createBooking({
+      groupId: groupId as Id<"groups">,
+      userId: fullUser?._id as Id<"users">,
+      startDate: startDate as string,
+      endDate: endDate as string,
+      note: note.trimStart().length > 0 ? note : undefined,
+    });
+
+    setSaveOpen(false);
+    setStartDate(null);
+    setEndDate(null);
+    setNote("");
+    setSelectedRange(undefined);
+  };
+
+  const handleDelete = () => {};
+
   // //
   if (
     validation === undefined ||
     members === undefined ||
     group === undefined ||
     bookings === undefined ||
-    fullUser === undefined
+    fullUser === undefined ||
+    bookedDates === undefined ||
+    userBookings === undefined
   ) {
     return <Loading />;
   }
-
   return (
     <div className="space-y-6">
       <h2 className="text-xl font-semibold">Calendar</h2>
@@ -89,12 +311,26 @@ export default function GroupCalendarPage() {
             <Calendar
               mode="range"
               disabled={{ before: new Date() }}
-              // get the range
               className="rounded-lg border text-sm"
               numberOfMonths={numberOfMonths}
+              components={{ DayButton: CustomDayButton }}
+              selected={selectedRange}
+              onSelect={handleSelect}
             />
 
-            <Button className="w-full">Save</Button>
+            <Button onClick={handleSave} className="w-full">
+              Save
+            </Button>
+
+            {userBookings.length > 0 && (
+              <Button
+                variant="destructive"
+                onClick={handleDelete}
+                className="w-full"
+              >
+                Delete
+              </Button>
+            )}
           </div>
         </div>
 
@@ -113,6 +349,31 @@ export default function GroupCalendarPage() {
           )}
         </div>
       </div>
+      <Dialog open={saveOpen} onOpenChange={setSaveOpen}>
+        <form className="flex-1">
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle>
+                {formatDateForDialog(startDate)}
+                {endDate !== startDate && " - " + formatDateForDialog(endDate)}
+              </DialogTitle>
+              <DialogDescription>Booking details</DialogDescription>
+            </DialogHeader>
+
+            <Label>Leave a Note</Label>
+            <Input value={note} onChange={(e) => setNote(e.target.value)} />
+
+            <DialogFooter>
+              <DialogClose asChild>
+                <Button size="lg" variant="outline">
+                  Close
+                </Button>
+              </DialogClose>
+              <Button onClick={handleCreate}>Save</Button>
+            </DialogFooter>
+          </DialogContent>
+        </form>
+      </Dialog>
     </div>
   );
 }
