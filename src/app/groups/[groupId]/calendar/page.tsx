@@ -247,10 +247,7 @@ export default function GroupCalendarPage() {
     );
   };
 
-  // If you need to use these for saving:
-  // const selectedStart = selectedRange?.from ? formatDate(selectedRange.from) : null;
-  // const selectedEnd = selectedRange?.to ? formatDate(selectedRange.to) : null;
-
+  // format date for dialog
   function formatDateForDialog(dateStr: string | null) {
     if (dateStr === null) return "";
     const monthNames = [
@@ -281,6 +278,12 @@ export default function GroupCalendarPage() {
   const handleSave = () => {
     if (selectedRange === undefined) {
       toast("Please select a date");
+    } else if (
+      userBookings &&
+      group &&
+      userBookings.length >= group.maxBookings
+    ) {
+      toast("You have too many bookings");
     } else {
       // set correct format for dates
       setStartDate(selectedRange.from ? formatDate(selectedRange.from) : null);

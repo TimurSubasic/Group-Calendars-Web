@@ -9,6 +9,7 @@ import { useMutation, useQuery } from "convex/react";
 import { useEffect, useState } from "react";
 import { api } from "../../../convex/_generated/api";
 import Loading from "@/components/Loading";
+import { toast } from "sonner";
 
 export default function UserSettingsPage() {
   const { signOut } = useClerk();
@@ -153,7 +154,12 @@ export default function UserSettingsPage() {
           >
             Log Out
           </Button>
-          <Button variant="destructive" className=" text-xl flex-1" size="xl">
+          <Button
+            onClick={() => toast("This feature is not available yet")}
+            variant="destructive"
+            className=" text-xl flex-1"
+            size="xl"
+          >
             Delete account
           </Button>
         </div>
