@@ -18,7 +18,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import SelectableUsers from "@/components/SelectableUsers";
+import SelectableUsersRemove from "@/components/SelectableUsersRemove";
 
 interface User {
   _id: Id<"users">;
@@ -113,16 +113,23 @@ export default function GroupMembersPage() {
 
   const handleSelectionChange = (selectedUsers: User[]) => {
     newUsers = selectedUsers;
+    console.log(newUsers.length);
   };
 
   const handleKick = async () => {
-    for (const user of newUsers) {
-      await removeMember({
-        groupId: groupId as Id<"groups">,
-        userId: user._id,
+    if (newUsers.length > 0) {
+      for (const user of newUsers) {
+        await removeMember({
+          groupId: groupId as Id<"groups">,
+          userId: user._id,
+        });
+      }
+      setKickOpen(false);
+    } else {
+      toast("Please select at least one member to kick", {
+        position: "top-center",
       });
     }
-    setKickOpen(false);
   };
 
   // //
@@ -166,13 +173,13 @@ export default function GroupMembersPage() {
         <form className="flex-1">
           <DialogContent className="sm:max-w-[425px]">
             <DialogHeader>
-              <DialogTitle>Add admins</DialogTitle>
+              <DialogTitle>Kick members</DialogTitle>
               <DialogDescription>
-                Admins can not be removed later, so choose wisely.
+                Select members to kick from the group.
               </DialogDescription>
             </DialogHeader>
             <div className="grid gap-8 my-5">
-              <SelectableUsers
+              <SelectableUsersRemove
                 users={nonAdmins}
                 onSelectionChange={handleSelectionChange}
               />

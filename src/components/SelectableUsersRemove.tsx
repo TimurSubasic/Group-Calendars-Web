@@ -10,15 +10,15 @@ interface User {
   clerkId: string;
 }
 
-interface SelectableUsersProps {
+interface SelectableUsersRemoveProps {
   users: (User | null)[];
   onSelectionChange: (selected: User[]) => void;
 }
 
-export default function SelectableUsers({
+export default function SelectableUsersRemove({
   users,
   onSelectionChange,
-}: SelectableUsersProps) {
+}: SelectableUsersRemoveProps) {
   const [selectedIds, setSelectedIds] = useState<Id<"users">[]>([]);
 
   const toggleSelect = (user: User | null) => {
@@ -49,7 +49,7 @@ export default function SelectableUsers({
             key={index}
             onClick={() => toggleSelect(user)}
             className={`w-full flex items-center justify-between flex-row bg-background rounded-lg p-4 border hover:shadow-lg dark:hover:shadow-background transition-shadow duration-150 cursor-pointer ${
-              isSelected ? "border-2 border-blue-500" : ""
+              isSelected ? "border-2 border-red-500 bg-red-500/10" : ""
             }`}
           >
             <div className="flex flex-row items-center justify-start gap-3">

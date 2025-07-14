@@ -31,7 +31,8 @@ import { useParams } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
 import Loading from "@/components/Loading";
 import { useRouter } from "next/navigation";
-import SelectableUsers from "@/components/SelectableUsers";
+import SelectableUsersAdd from "@/components/SelectableUsersAdd";
+import { toast } from "sonner";
 
 interface User {
   _id: Id<"users">;
@@ -167,6 +168,10 @@ export default function GroupSettingsPage() {
       }
       setAdminsOpen(false);
       newUsers = []; //* Reset the newUsers array after adding
+    } else {
+      toast("Please select at least one member to add as admin", {
+        position: "top-center",
+      });
     }
   };
 
@@ -341,7 +346,7 @@ export default function GroupSettingsPage() {
               </DialogDescription>
             </DialogHeader>
             <div className="grid gap-8 my-5">
-              <SelectableUsers
+              <SelectableUsersAdd
                 users={nonAdmins}
                 onSelectionChange={handleSelectionChange}
               />
