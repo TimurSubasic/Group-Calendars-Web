@@ -6,9 +6,11 @@ export function useBreakpoint(): number {
   useEffect(() => {
     const checkSize = () => {
       const width = window.innerWidth;
-      if (width >= 1280) setMonths(4); // xl
-      else if (width >= 1024) setMonths(3); // lg
-      else if (width >= 768) setMonths(2); // md
+      //if (width >= 1280) setMonths(4); // xl else
+      if (width >= 1024)
+        setMonths(3); // lg
+      else if (width >= 768)
+        setMonths(2); // md
       else setMonths(1); // default
     };
 

@@ -286,7 +286,29 @@ export default function GroupCalendarPage() {
     setSelectedRange(undefined);
   };
 
-  const handleDelete = () => {};
+  const deleteBooking = useMutation(api.bookings.deleteBooking);
+
+  // For deleting bookings
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [selectedBookings, setSelectedBookings] = useState<Id<"bookings">[]>(
+    []
+  ); // store booking _id's
+
+  // Open delete dialog
+  const openDeleteDialog = () => {
+    setDeleteOpen(true);
+    setSelectedBookings([]);
+  };
+
+  // Confirm deletion
+  const handleDelete = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    for (const bookingId of selectedBookings) {
+      await deleteBooking({ bookingId });
+    }
+    setDeleteOpen(false);
+    setSelectedBookings([]);
+  };
 
   // //
   if (
@@ -307,11 +329,11 @@ export default function GroupCalendarPage() {
       <div className="bg-muted/50 rounded-lg p-8">
         <div className="flex items-center justify-center w-full">
           {/* calendar with buttons */}
-          <div className="inline-block bg-background space-y-6 rounded-lg border p-5 w-full max-w-6xl">
+          <div className="inline-block bg-background space-y-6 rounded-lg p-5 border">
             <Calendar
               mode="range"
               disabled={{ before: new Date() }}
-              className="rounded-lg border text-sm"
+              className="rounded-lg border text-sm mx-auto w-fit"
               numberOfMonths={numberOfMonths}
               components={{ DayButton: CustomDayButton }}
               selected={selectedRange}
@@ -325,7 +347,7 @@ export default function GroupCalendarPage() {
             {userBookings.length > 0 && (
               <Button
                 variant="destructive"
-                onClick={handleDelete}
+                onClick={openDeleteDialog}
                 className="w-full"
               >
                 Delete
@@ -370,6 +392,58 @@ export default function GroupCalendarPage() {
                 </Button>
               </DialogClose>
               <Button onClick={handleCreate}>Save</Button>
+            </DialogFooter>
+          </DialogContent>
+        </form>
+      </Dialog>
+      <Dialog open={deleteOpen} onOpenChange={setDeleteOpen}>
+        <form className="flex-1" onSubmit={handleDelete}>
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle>Delete Bookings</DialogTitle>
+              <DialogDescription>
+                Select the bookings you want to delete. This action cannot be
+                undone.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-8 my-5">
+              {userBookings.length > 0 ? (
+                <div className="flex flex-col gap-4">
+                  {userBookings.map((booking: (typeof userBookings)[0]) => (
+                    <div
+                      key={booking._id}
+                      onClick={() => {
+                        setSelectedBookings((prev) =>
+                          prev.includes(booking._id)
+                            ? prev.filter((id) => id !== booking._id)
+                            : [...prev, booking._id]
+                        );
+                      }}
+                      className={`cursor-pointer border rounded-lg p-2 ${selectedBookings.includes(booking._id) ? "border-destructive bg-destructive/10" : "border-muted"}`}
+                    >
+                      <BookingCard booking={booking} />
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p>No bookings to delete.</p>
+              )}
+            </div>
+            <DialogFooter>
+              <DialogClose asChild>
+                <Button size="lg" variant="outline" type="button">
+                  Cancel
+                </Button>
+              </DialogClose>
+              <Button
+                size="lg"
+                variant={"destructive"}
+                type="submit"
+                disabled={selectedBookings.length === 0}
+                onClick={handleDelete}
+              >
+                Delete
+              </Button>
             </DialogFooter>
           </DialogContent>
         </form>
