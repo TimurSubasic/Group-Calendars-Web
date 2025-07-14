@@ -328,11 +328,17 @@ export default function GroupCalendarPage() {
   // Confirm deletion
   const handleDelete = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
-    for (const bookingId of selectedBookings) {
-      await deleteBooking({ bookingId });
+    if (selectedBookings.length > 0) {
+      for (const bookingId of selectedBookings) {
+        await deleteBooking({ bookingId });
+      }
+      setDeleteOpen(false);
+      setSelectedBookings([]);
+    } else {
+      toast("Please select a booking to delete", {
+        position: "top-center",
+      });
     }
-    setDeleteOpen(false);
-    setSelectedBookings([]);
   };
 
   // //
@@ -478,7 +484,6 @@ export default function GroupCalendarPage() {
                 size="lg"
                 variant={"destructive"}
                 type="submit"
-                disabled={selectedBookings.length === 0}
                 onClick={handleDelete}
               >
                 Delete
