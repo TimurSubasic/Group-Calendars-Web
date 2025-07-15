@@ -18,7 +18,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import SelectableUsersRemove from "@/components/SelectableUsersRemove";
+import SelectableUsers from "@/components/SelectableUsers";
 
 interface User {
   _id: Id<"users">;
@@ -98,7 +98,6 @@ export default function GroupMembersPage() {
           label: "Undo",
           onClick: async () => await navigator.clipboard.writeText(""),
         },
-        position: "top-center",
       });
     } catch {
       toast("Error occurred while copying code");
@@ -126,9 +125,7 @@ export default function GroupMembersPage() {
       }
       setKickOpen(false);
     } else {
-      toast("Please select at least one member to kick", {
-        position: "top-center",
-      });
+      toast.error("Select at least one member to kick");
     }
   };
 
@@ -179,9 +176,10 @@ export default function GroupMembersPage() {
               </DialogDescription>
             </DialogHeader>
             <div className="grid gap-8 my-5">
-              <SelectableUsersRemove
+              <SelectableUsers
                 users={nonAdmins}
                 onSelectionChange={handleSelectionChange}
+                destructive={true}
               />
             </div>
             <DialogFooter>

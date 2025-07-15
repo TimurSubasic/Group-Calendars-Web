@@ -277,13 +277,14 @@ export default function GroupCalendarPage() {
 
   const handleSave = () => {
     if (selectedRange === undefined) {
-      toast("Please select a date");
+      toast.info("Please select a date");
     } else if (
       userBookings &&
       group &&
       userBookings.length >= group.maxBookings
     ) {
-      toast("You have too many bookings");
+      toast.warning("You have reached the maximum number of bookings");
+      setSelectedRange(undefined);
     } else {
       // set correct format for dates
       setStartDate(selectedRange.from ? formatDate(selectedRange.from) : null);
@@ -295,14 +296,20 @@ export default function GroupCalendarPage() {
 
   const createBooking = useMutation(api.bookings.createBooking);
 
-  const handleCreate = () => {
-    createBooking({
+  const handleCreate = async () => {
+    const result = await createBooking({
       groupId: groupId as Id<"groups">,
       userId: fullUser?._id as Id<"users">,
       startDate: startDate as string,
       endDate: endDate as string,
       note: note.trimStart().length > 0 ? note : undefined,
     });
+
+    if (result.success) {
+      toast.success(result.message);
+    } else {
+      toast.error(result.message);
+    }
 
     setSaveOpen(false);
     setStartDate(null);
@@ -335,9 +342,7 @@ export default function GroupCalendarPage() {
       setDeleteOpen(false);
       setSelectedBookings([]);
     } else {
-      toast("Please select a booking to delete", {
-        position: "top-center",
-      });
+      toast.error("Select a booking to delete");
     }
   };
 
@@ -413,7 +418,10 @@ export default function GroupCalendarPage() {
               <DialogDescription>Booking details</DialogDescription>
             </DialogHeader>
 
-            <Label>Leave a Note</Label>
+            <Label className="flex gap-2 items-center ">
+              Leave a Note
+              <p className="text-xs text-muted-foreground">(optional)</p>
+            </Label>
             <Input value={note} onChange={(e) => setNote(e.target.value)} />
 
             <DialogFooter>

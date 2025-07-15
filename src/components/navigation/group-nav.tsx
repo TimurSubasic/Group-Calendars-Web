@@ -19,6 +19,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useUser } from "@clerk/nextjs";
+import { toast } from "sonner";
 
 export function GroupNav() {
   const pathname = usePathname();
@@ -105,6 +106,19 @@ export function GroupNav() {
   // Confirm deletion
   const handleDelete = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
+    if (selectedBookings.length === 0) {
+      toast.error("Select a booking to delete");
+      return;
+    } else if (
+      userBookings &&
+      group &&
+      userBookings.length - selectedBookings.length > group.maxBookings
+    ) {
+      toast.error(
+        `Please select ${userBookings.length - selectedBookings.length - group.maxBookings} more`
+      );
+      return;
+    }
     for (const bookingId of selectedBookings) {
       await deleteBooking({ bookingId });
     }
@@ -135,7 +149,7 @@ export function GroupNav() {
   // If group is valid
   if (validation.success) {
     return (
-      <div className="space-y-4">
+      <div className="space-y-4 sticky top-0 z-10 bg-background pt-2">
         <div className="flex items-center space-x-4">
           <Button variant="ghost" size="sm" asChild>
             <Link href="/groups">
@@ -173,9 +187,9 @@ export function GroupNav() {
               <DialogHeader>
                 <DialogTitle>You have too many bookings</DialogTitle>
                 <DialogDescription>
-                  This group has a maximum of {group?.maxBookings} bookings. You
-                  have {userBookings.length} bookings. Please delete some
-                  bookings to continue.
+                  Please delete{" "}
+                  {group && userBookings.length - group.maxBookings} bookings to
+                  continue.
                 </DialogDescription>
               </DialogHeader>
               <div className="grid gap-8 my-5">
@@ -220,7 +234,6 @@ export function GroupNav() {
                   size="lg"
                   variant={"destructive"}
                   type="submit"
-                  disabled={selectedBookings.length === 0}
                   onClick={handleDelete}
                 >
                   Delete

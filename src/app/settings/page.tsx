@@ -6,6 +6,15 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useClerk, useUser } from "@clerk/nextjs";
 import { useMutation, useQuery } from "convex/react";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { useEffect, useState } from "react";
 import { api } from "../../../convex/_generated/api";
 import Loading from "@/components/Loading";
@@ -26,6 +35,8 @@ export default function UserSettingsPage() {
   const [pickedColor, setPickedColor] = useState(fullUser?.color);
   const [text, setText] = useState("");
   const [showError, setShowError] = useState(false);
+  const [logOutOpen, setLogOutOpen] = useState(false);
+  const [deleteAccountOpen, setDeleteAccountOpen] = useState(false);
 
   useEffect(() => {
     setPickedColor(fullUser?.color);
@@ -150,12 +161,12 @@ export default function UserSettingsPage() {
             variant="destructive"
             className="text-xl flex-1"
             size="xl"
-            onClick={() => signOut({ redirectUrl: "/" })}
+            onClick={() => setLogOutOpen(true)}
           >
             Log Out
           </Button>
           <Button
-            onClick={() => toast("This feature is not available yet")}
+            onClick={() => setDeleteAccountOpen(true)}
             variant="destructive"
             className=" text-xl flex-1"
             size="xl"
@@ -164,6 +175,62 @@ export default function UserSettingsPage() {
           </Button>
         </div>
       </div>
+
+      <Dialog open={logOutOpen} onOpenChange={setLogOutOpen}>
+        <form className="flex-1">
+          <DialogContent className="sm:max-w-[350px]">
+            <DialogHeader>
+              <DialogTitle>Log Out</DialogTitle>
+              <DialogDescription>
+                Are you sure you want to log out?
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter className="mt-5">
+              <DialogClose asChild>
+                <Button size="lg" variant="outline">
+                  Cancel
+                </Button>
+              </DialogClose>
+              <Button
+                size="lg"
+                type="submit"
+                variant="destructive"
+                onClick={() => signOut({ redirectUrl: "/" })}
+              >
+                Log Out
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </form>
+      </Dialog>
+
+      <Dialog open={deleteAccountOpen} onOpenChange={setDeleteAccountOpen}>
+        <form className="flex-1">
+          <DialogContent className="sm:max-w-[350px]">
+            <DialogHeader>
+              <DialogTitle>Delete Account</DialogTitle>
+              <DialogDescription>
+                Are you sure you want to delete your account?
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter className="mt-5">
+              <DialogClose asChild>
+                <Button size="lg" variant="outline">
+                  Cancel
+                </Button>
+              </DialogClose>
+              <Button
+                size="lg"
+                type="submit"
+                variant="destructive"
+                onClick={() => toast("This feature is not available yet")}
+              >
+                Delete
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </form>
+      </Dialog>
     </div>
   );
 }

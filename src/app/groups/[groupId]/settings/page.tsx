@@ -31,7 +31,7 @@ import { useParams } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
 import Loading from "@/components/Loading";
 import { useRouter } from "next/navigation";
-import SelectableUsersAdd from "@/components/SelectableUsersAdd";
+import SelectableUsersAdd from "@/components/SelectableUsers";
 import { toast } from "sonner";
 
 interface User {
@@ -169,13 +169,14 @@ export default function GroupSettingsPage() {
       setAdminsOpen(false);
       newUsers = []; //* Reset the newUsers array after adding
     } else {
-      toast("Please select at least one member to add as admin", {
-        position: "top-center",
-      });
+      toast.info("Select at least one member to add as admin");
     }
   };
 
   //! remove and delete
+  const [leaveOpen, setLeaveOpen] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
+
   const removeMember = useMutation(api.groupMembers.removeMember);
 
   const handleLeave = async () => {
@@ -299,7 +300,7 @@ export default function GroupSettingsPage() {
 
             <div className="flex flex-col md:flex-row gap-4">
               <Button
-                onClick={handleLeave}
+                onClick={() => setLeaveOpen(true)}
                 variant="destructive"
                 className=" flex-1"
                 size="xl"
@@ -307,7 +308,7 @@ export default function GroupSettingsPage() {
                 Leave
               </Button>
               <Button
-                onClick={handleDelete}
+                onClick={() => setDeleteOpen(true)}
                 variant="destructive"
                 className=" flex-1"
                 size="xl"
@@ -359,6 +360,62 @@ export default function GroupSettingsPage() {
               </DialogClose>
               <Button size="lg" type="submit" onClick={handleAddAdmins}>
                 Add Admins
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </form>
+      </Dialog>
+
+      <Dialog open={leaveOpen} onOpenChange={setLeaveOpen}>
+        <form className="flex-1">
+          <DialogContent className="sm:max-w-[350px]">
+            <DialogHeader>
+              <DialogTitle>Leave Group</DialogTitle>
+              <DialogDescription>
+                Are you sure you want to leave this group?
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter className="mt-5">
+              <DialogClose asChild>
+                <Button size="lg" variant="outline">
+                  Cancel
+                </Button>
+              </DialogClose>
+              <Button
+                size="lg"
+                type="submit"
+                variant="destructive"
+                onClick={handleLeave}
+              >
+                Leave
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </form>
+      </Dialog>
+
+      <Dialog open={deleteOpen} onOpenChange={setDeleteOpen}>
+        <form className="flex-1">
+          <DialogContent className="sm:max-w-[350px]">
+            <DialogHeader>
+              <DialogTitle>Delete Group</DialogTitle>
+              <DialogDescription>
+                Are you sure you want to delete this group?
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter className="mt-5">
+              <DialogClose asChild>
+                <Button size="lg" variant="outline">
+                  Cancel
+                </Button>
+              </DialogClose>
+              <Button
+                size="lg"
+                type="submit"
+                variant="destructive"
+                onClick={handleDelete}
+              >
+                Delete
               </Button>
             </DialogFooter>
           </DialogContent>
