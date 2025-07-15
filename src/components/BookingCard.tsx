@@ -44,7 +44,9 @@ export default function BookingCard({
             <div className="flex flex-col items-start space-y-2">
               <p className="font-semibold text-xl">{booking?.username}</p>
               <p className="text-md font-bold">
-                {booking.startDate} - {booking.endDate}
+                {booking.startDate}
+                {booking.startDate !== booking.endDate &&
+                  " - " + booking.endDate}
               </p>
             </div>
           </div>

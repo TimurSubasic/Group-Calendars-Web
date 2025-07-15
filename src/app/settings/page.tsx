@@ -4,7 +4,7 @@ import colors from "@/components/colors";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useClerk, useUser } from "@clerk/nextjs";
+import { useClerk, UserButton, useUser } from "@clerk/nextjs";
 import { useMutation, useQuery } from "convex/react";
 import {
   Dialog,
@@ -18,7 +18,7 @@ import {
 import { useEffect, useState } from "react";
 import { api } from "../../../convex/_generated/api";
 import Loading from "@/components/Loading";
-import { toast } from "sonner";
+import { clerkClient } from "@clerk/nextjs/server";
 
 export default function UserSettingsPage() {
   const { signOut } = useClerk();
@@ -84,6 +84,23 @@ export default function UserSettingsPage() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [debouncedColor, fullUser]);
+
+  const deleteAccount = useMutation(api.users.deleteAccount);
+
+  const handleDeleteAccount = async () => {
+    if (fullUser === null || fullUser === undefined) {
+      return;
+    }
+
+    //? Removes data but keeps the user in clerk and convex
+    deleteAccount({
+      userId: fullUser._id,
+    });
+    //? Logs out the user
+    signOut({ redirectUrl: "/" });
+
+    // TODO: Actually delete the user from clerk and convex
+  };
 
   if (fullUser === undefined) {
     return <Loading />;
@@ -223,7 +240,7 @@ export default function UserSettingsPage() {
                 size="lg"
                 type="submit"
                 variant="destructive"
-                onClick={() => toast("This feature is not available yet")}
+                onClick={handleDeleteAccount}
               >
                 Delete
               </Button>
