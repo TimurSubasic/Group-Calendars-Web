@@ -4,7 +4,7 @@ import colors from "@/components/colors";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useClerk, UserButton, useUser } from "@clerk/nextjs";
+import { useClerk, useUser } from "@clerk/nextjs";
 import { useMutation, useQuery } from "convex/react";
 import {
   Dialog,
@@ -18,7 +18,6 @@ import {
 import { useEffect, useState } from "react";
 import { api } from "../../../convex/_generated/api";
 import Loading from "@/components/Loading";
-import { clerkClient } from "@clerk/nextjs/server";
 
 export default function UserSettingsPage() {
   const { signOut } = useClerk();
