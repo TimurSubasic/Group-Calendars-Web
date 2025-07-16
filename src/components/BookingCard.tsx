@@ -11,6 +11,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { toast } from "sonner";
 
 export default function BookingCard({
   booking,
@@ -26,11 +27,21 @@ export default function BookingCard({
 }) {
   const [noteOpen, setNoteOpen] = useState(false);
 
+  const handleCardClick = () => {
+    if (booking.note) {
+      setNoteOpen(true);
+    } else {
+      toast.info("No note found");
+    }
+  };
+
   return (
     <div>
       <div
+        onClick={handleCardClick}
         style={{
           borderColor: booking.color,
+          cursor: booking.note ? "pointer" : "default",
         }}
         className="w-full flex items-center justify-between bg-background rounded-lg p-4 border hover:shadow-lg dark:hover:shadow-background transition-shadow duration-150"
       >
