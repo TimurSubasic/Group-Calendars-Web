@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { TbNotes, TbNotesOff } from "react-icons/tb";
 import { Id } from "../../convex/_generated/dataModel";
 import { Button } from "./ui/button";
 import {
@@ -28,8 +29,10 @@ export default function BookingCard({
   return (
     <div>
       <div
-        style={{ borderColor: booking.color }}
-        className="w-full flex items-center justify-between flex-row bg-background rounded-lg p-4 border hover:shadow-lg dark:hover:shadow-background transition-shadow duration-150"
+        style={{
+          borderColor: booking.color,
+        }}
+        className="w-full flex items-center justify-between bg-background rounded-lg p-4 border hover:shadow-lg dark:hover:shadow-background transition-shadow duration-150"
       >
         <div className="flex flex-col items-start">
           <div className="flex flex-row items-center justify-start gap-3">
@@ -43,7 +46,7 @@ export default function BookingCard({
             </div>
             <div className="flex flex-col items-start space-y-2">
               <p className="font-semibold text-xl">{booking?.username}</p>
-              <p className="text-md font-bold">
+              <p className="text-sm sm:text-md font-bold">
                 {booking.startDate}
                 {booking.startDate !== booking.endDate &&
                   " - " + booking.endDate}
@@ -52,20 +55,25 @@ export default function BookingCard({
           </div>
         </div>
         <div className="flex space-x-3 items-center justify-center">
-          {booking.note && (
+          {booking.note ? (
             <Button
+              size="icon"
               style={{ borderColor: booking.color }}
               onClick={() => setNoteOpen(true)}
               variant="outline"
             >
-              View Note
+              <TbNotes className=" size-8" />
+            </Button>
+          ) : (
+            <Button
+              size="icon"
+              style={{ borderColor: booking.color }}
+              variant="outline"
+              disabled
+            >
+              <TbNotesOff className="size-8" />
             </Button>
           )}
-
-          {/* <div
-            style={{ backgroundColor: booking.color }}
-            className="h-5 w-5 rounded-full"
-          /> */}
         </div>
       </div>
 
