@@ -128,6 +128,7 @@ export default function GroupsPage() {
     } else {
       setJoinMessage(joinGroup?.message as string);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [joinGroup]);
 
   useEffect(() => {
