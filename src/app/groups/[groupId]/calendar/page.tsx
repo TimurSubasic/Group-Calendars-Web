@@ -237,7 +237,7 @@ export default function GroupCalendarPage() {
             : isSelected
               ? `!text-white ${roundedClass} ${borderClass}`
               : "") +
-          " " +
+          " w-full " +
           (props.className || "")
         }
         // disabled={booked ? true : false}
