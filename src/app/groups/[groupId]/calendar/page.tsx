@@ -148,7 +148,7 @@ export default function GroupCalendarPage() {
     if (!range || !range.from) return;
     // Check if picked date is booked
     if (range.from && range.to && isRangeOverlapping(range.from, range.to)) {
-      toast("Date already booked", {
+      toast.warning("Date already booked", {
         description: "Please select a different date",
       });
       setSelectedRange(undefined);
@@ -240,7 +240,6 @@ export default function GroupCalendarPage() {
           " w-full " +
           (props.className || "")
         }
-        // disabled={booked ? true : false}
       >
         {props.children}
       </Button>
