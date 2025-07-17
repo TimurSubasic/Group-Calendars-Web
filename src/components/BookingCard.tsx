@@ -97,7 +97,7 @@ export default function BookingCard({
               </DialogTitle>
               <DialogDescription>Note</DialogDescription>
             </DialogHeader>
-            <div className="flex flex-row items-center justify-start gap-3 text-white">
+            <div className="flex flex-row items-center justify-start gap-3">
               <div
                 style={{ backgroundColor: booking?.color }}
                 className="w-14 h-14 rounded-full flex items-center justify-center"
