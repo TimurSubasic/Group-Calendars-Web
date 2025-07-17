@@ -35,6 +35,7 @@ import { useMutation, useQuery } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import Loading from "@/components/Loading";
 import { Id } from "../../../convex/_generated/dataModel";
+import { useRouter } from "next/navigation";
 
 //Mock data - replace with your actual data fetching
 
@@ -43,6 +44,17 @@ import { Id } from "../../../convex/_generated/dataModel";
 export default function GroupsPage() {
   // get user
   const { user } = useUser();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const code = localStorage.getItem("join_code");
+      if (code) {
+        localStorage.removeItem("join_code");
+        router.replace(`/join?code=${code}`);
+      }
+    }
+  }, [router]);
 
   const clerkId = user?.id as string;
 
