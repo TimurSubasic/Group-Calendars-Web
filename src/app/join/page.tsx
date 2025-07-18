@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
 import { useMutation, useQuery } from "convex/react";
@@ -12,44 +12,61 @@ import { toast } from "sonner";
 export default function Join() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const code = searchParams.get("code")?.toUpperCase();
   const { user, isLoaded } = useUser();
 
-  // Get full user from Convex
-  const clerkId = user?.id as string | undefined;
-  const fullUser = useQuery(
-    api.users.getUserByClerk,
-    clerkId ? { clerkId } : "skip"
-  );
+  const [code, setCode] = useState<string | null>(null);
+  const [ready, setReady] = useState(false); // controls when queries are allowed
 
-  // Query group by code
-  const joinGroup = useQuery(
-    api.groups.getByCode,
-    code ? { joinCode: code } : "skip"
-  );
-  const addMember = useMutation(api.groupMembers.addMember);
-
+  // Set the code in a useEffect to avoid calling useSearchParams during render
   useEffect(() => {
-    if (!isLoaded || !fullUser) return;
-    if (!code) {
+    const c = searchParams.get("code")?.toUpperCase();
+    if (!c) {
       toast.error("No code provided in URL.");
       router.replace("/groups");
       return;
     }
-    // If group found, add member
-    if (joinGroup?.success) {
+    setCode(c);
+  }, [searchParams, router]);
+
+  // After user and code are both ready, allow querying
+  useEffect(() => {
+    if (isLoaded && user && code) {
+      setReady(true);
+    }
+  }, [isLoaded, user, code]);
+
+  const clerkId = user?.id;
+  const fullUser = useQuery(
+    api.users.getUserByClerk,
+    ready && clerkId ? { clerkId } : "skip"
+  );
+  const joinGroup = useQuery(
+    api.groups.getByCode,
+    ready && code ? { joinCode: code } : "skip"
+  );
+  const addMember = useMutation(api.groupMembers.addMember);
+
+  useEffect(() => {
+    if (!ready || !fullUser || !joinGroup) return;
+
+    if (joinGroup.success) {
       addMember({
         groupId: joinGroup.groupId as Id<"groups">,
         userId: fullUser._id,
-      }).catch(() => {
-        toast.error("Failed to join group.");
-      });
-      toast.success("Joined group successfully.");
-    } else if (joinGroup && !joinGroup.success) {
+      })
+        .then(() => {
+          toast.success("Joined group successfully.");
+          router.replace("/groups");
+        })
+        .catch(() => {
+          toast.error("Failed to join group.");
+          router.replace("/groups");
+        });
+    } else {
       toast.error(joinGroup.message);
+      router.replace("/groups");
     }
-    router.replace("/groups");
-  }, [isLoaded, code, joinGroup, fullUser, router, addMember]);
+  }, [ready, fullUser, joinGroup, addMember, router]);
 
   return <Loading />;
 }
