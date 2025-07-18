@@ -38,8 +38,22 @@ function JoinInner() {
   );
   const addMember = useMutation(api.groupMembers.addMember);
 
+  const handleAddMember = async () => {
+    if (!joinGroup?.groupId || !fullUser?._id) return;
+    const result = await addMember({
+      groupId: joinGroup?.groupId as Id<"groups">,
+      userId: fullUser?._id,
+    });
+
+    if (result.success) {
+      toast.success("Joined group successfully.");
+    } else {
+      toast.warning(result.message);
+    }
+  };
+
   useEffect(() => {
-    if (!isLoaded || !code || !fullUser) return;
+    if (!isLoaded || !code || !fullUser || !joinGroup) return;
     if (!code) {
       toast.error("No code provided in URL.");
       router.replace("/groups");
@@ -47,18 +61,13 @@ function JoinInner() {
     }
     // If group found, add member
     if (joinGroup?.success) {
-      addMember({
-        groupId: joinGroup.groupId as Id<"groups">,
-        userId: fullUser._id,
-      }).catch(() => {
-        toast.error("Failed to join group.");
-      });
-      toast.success("Joined group successfully.");
-    } else if (joinGroup && !joinGroup.success) {
+      handleAddMember();
+    } else {
       toast.error(joinGroup.message);
     }
     router.replace("/groups");
-  }, [isLoaded, code, joinGroup, fullUser, router, addMember]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isLoaded, code, joinGroup, fullUser, router]);
 
   return <Loading />;
 }
