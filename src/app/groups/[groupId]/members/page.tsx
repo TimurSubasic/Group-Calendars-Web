@@ -89,19 +89,31 @@ export default function GroupMembersPage() {
   );
 
   // *add members
-  const handleAdd = async () => {
+  const [addOpen, setAddOpen] = useState(false);
+
+  const copyCode = async () => {
     try {
       await navigator.clipboard.writeText(group?.joinCode as string);
-      toast(group?.joinCode, {
-        description: "Code has been copied, send it to your friends!",
-        action: {
-          label: "Undo",
-          onClick: async () => await navigator.clipboard.writeText(""),
-        },
+      toast.success("Code copied: " + group?.joinCode, {
+        description: "Send it to your friends!",
       });
     } catch {
-      toast("Error occurred while copying code");
+      toast.error("Error occurred while copying code");
     }
+    setAddOpen(false);
+  };
+
+  const copyLink = async () => {
+    try {
+      const url = window.location.origin + "/join?code=" + group?.joinCode;
+      await navigator.clipboard.writeText(url);
+      toast.success("Link Copied", {
+        description: "Send it to your friends!",
+      });
+    } catch {
+      toast.error("Error occurred while copying code");
+    }
+    setAddOpen(false);
   };
 
   //! kick members
@@ -148,7 +160,11 @@ export default function GroupMembersPage() {
 
         <div className="w-full flex flex-col items-center justify-center gap-5 mt-5 md:flex-row">
           {group?.allowJoin && (
-            <Button onClick={handleAdd} className="flex-1 w-full" size="xl">
+            <Button
+              onClick={() => setAddOpen(true)}
+              className="flex-1 w-full"
+              size="xl"
+            >
               Add Members
             </Button>
           )}
@@ -165,6 +181,35 @@ export default function GroupMembersPage() {
           )}
         </div>
       </div>
+
+      <Dialog open={addOpen} onOpenChange={setAddOpen}>
+        <form className="flex-1">
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle>Add members</DialogTitle>
+              <DialogDescription>Send it to your friends</DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-8 my-5">
+              <p className="text-center sm:text-start">
+                Copy the invite link or the join code
+              </p>
+            </div>
+            <DialogFooter>
+              <Button
+                size="lg"
+                type="submit"
+                variant="outline"
+                onClick={copyCode}
+              >
+                Copy Code
+              </Button>
+              <Button size="lg" type="submit" onClick={copyLink}>
+                Copy Link
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </form>
+      </Dialog>
 
       <Dialog open={kickOpen} onOpenChange={setKickOpen}>
         <form className="flex-1">
