@@ -6,9 +6,18 @@ import { useSignIn } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 import { FcGoogle } from "react-icons/fc";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
+import Loading from "@/components/Loading";
 
 export default function OauthSignIn() {
+  return (
+    <Suspense fallback={<Loading />}>
+      <SignInInner />
+    </Suspense>
+  );
+}
+
+function SignInInner() {
   const { signIn } = useSignIn();
 
   const searchParams = useSearchParams();
