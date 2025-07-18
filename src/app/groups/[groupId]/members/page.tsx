@@ -201,10 +201,10 @@ export default function GroupMembersPage() {
                 variant="outline"
                 onClick={copyCode}
               >
-                Copy Code
+                Join Code
               </Button>
               <Button size="lg" type="submit" onClick={copyLink}>
-                Copy Link
+                Invite Link
               </Button>
             </DialogFooter>
           </DialogContent>
