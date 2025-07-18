@@ -30,22 +30,12 @@ export default function Join() {
   const addMember = useMutation(api.groupMembers.addMember);
 
   useEffect(() => {
-    if (!isLoaded) return;
+    if (!isLoaded || !fullUser) return;
     if (!code) {
       toast.error("No code provided in URL.");
       router.replace("/groups");
       return;
     }
-    //If not authenticated, save code to localStorage and redirect to sign-in
-    if (!user) {
-      if (typeof window !== "undefined") {
-        localStorage.setItem("join_code", code);
-      }
-      router.replace("/sign-in");
-      return;
-    }
-    // Wait for fullUser to load
-    if (!fullUser) return;
     // If group found, add member
     if (joinGroup?.success) {
       addMember({
@@ -59,8 +49,7 @@ export default function Join() {
       toast.error(joinGroup.message);
     }
     router.replace("/groups");
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user, isLoaded, code, joinGroup, fullUser]);
+  }, [isLoaded, code, joinGroup, fullUser, router, addMember]);
 
   return <Loading />;
 }

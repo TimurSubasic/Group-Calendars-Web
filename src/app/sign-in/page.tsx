@@ -5,9 +5,31 @@ import { OAuthStrategy } from "@clerk/types";
 import { useSignIn } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 import { FcGoogle } from "react-icons/fc";
+import { useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 
 export default function OauthSignIn() {
   const { signIn } = useSignIn();
+
+  const searchParams = useSearchParams();
+
+  const [code, setCode] = useState<string | null>(null);
+
+  useEffect(() => {
+    const redirectUrl = searchParams.get("redirect_url");
+
+    if (redirectUrl) {
+      const decodedUrl = decodeURIComponent(redirectUrl); // step 2
+      const parsedRedirectUrl = new URL(decodedUrl); // step 3
+      const inviteCode = parsedRedirectUrl.searchParams.get("code"); // step 4
+      setCode(inviteCode);
+    }
+  }, [searchParams]);
+
+  if (code) {
+    localStorage.setItem("join_code", code);
+    console.log("code", code);
+  }
 
   if (!signIn) return null;
 
